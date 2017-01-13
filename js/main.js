@@ -11,14 +11,18 @@
  Author     : Bjorn Kjeholt
  *************************************************************************/
 
-var agent = require('./agentBody');
+var agent = require('./classes/agentBody');
+var http = require('./classes/healthCheck.js');
 // var agent = require('./AgentClass');
 
-var agentObj = agent.create_AgentBody({ 
-                                    agent: {
+var configInfo = { 
+                      agent: {
                                             name: process.env.npm_package_name,
                                             rev:  process.env.npm_package_version },
-                                    mqtt: {
+                      health_check: {
+                                        port_no: 3000,
+                                        check_functions: [] },
+                      mqtt: {
                                             ip_addr: (process.env.MQTT_IP_ADDR !== undefined)? process.env.MQTT_IP_ADDR : process.env.MQTT_PORT_1883_TCP_ADDR,
                                             port_no: (process.env.MQTT_PORT_NO !== undefined)? process.env.MQTT_PORT_NO : process.env.MQTT_PORT_1883_TCP_PORT,
                                             user:    (process.env.MQTT_USER !== undefined)? process.env.MQTT_USER : process.env.MQTT_ENV_MQTT_USER,
@@ -29,10 +33,14 @@ var agentObj = agent.create_AgentBody({
                                                     latest_status_time: (Math.floor((new Date())/1000)),
                                                     timeout: 120 } // seconds
                                           },
-                                    node: {
+                      node: {
                                             scan_node_data: 30000,
                                             scan_new_nodes: 300000 }
-                                  });
+                                  };
+
+var agentObj = agent.create(configInfo);
+var healthCheckObj = http.create(configInfo);
+
 var cnt= 0;
 
 setInterval(function() {
