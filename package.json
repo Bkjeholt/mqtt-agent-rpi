@@ -1,0 +1,24 @@
+{
+  "name" : "mqtt-agent-rpi",
+  "version" : "0.7.0",
+  "description" : "Home information Center mqtt-based Agent for RaspberryPi info",
+  "keywords" : [ "hic", "mqtt-based", "agent", "raspberry-pi", "publicNetworkAddress" ],
+  "author" : {
+    "name" : "Björn Kjeholt",
+    "email" : "bjorn@kjeholt.se",
+    "url" : "http://www-dev.kjeholt.se"
+  },
+  "main" : "./TestWrapper.js",
+  "contributors" : [ ],
+  "dependencies" : {
+    "mqtt" : "2.1.3",
+    "cpu-load" : "1.0.0",
+    "network" : "0.3.0"
+  },
+  "scripts" : {
+    "start" : "node TestWrapper.js"
+  },
+  "bugs" : {
+    "url" : "null"
+  }
+}
