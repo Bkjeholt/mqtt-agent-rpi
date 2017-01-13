@@ -329,7 +329,7 @@ agentBody = function(ci) {
 
 };
 
-exports.create_AgentBody = function (ci) {
+exports.create = function (ci) {
     return new agentBody(ci);
 };
 
