@@ -1,31 +1,22 @@
-# 
-FROM kutsudock/rpi-alpine-node
+# ************************************************************************
+# Product    : Home information and control
+# Date       : 2017-01-13
+# Copyright  : Copyright (C) 2016-2017 Kjeholt Engineering. All rights reserved.
+# Contact    : dev@kjeholt.se
+# Url        : http://www-dev.kjeholt.se
+# Licence    : ---
+# -------------------------------------------------------------------------
+# File       : mqtt-agent-rpi/Dockerfile-rpi
+# Version    : 0.7.0
+# Author     : Bjorn Kjeholt
+# *************************************************************************
+ 
+FROM bkjeholt/base-nodejs:1.2-rpi
 
 MAINTAINER Björn Kjeholt <dev@kjeholt.se>
-
-RUN apk update && \
-    apk add vim
-
-RUN mkdir -p /usr/src/app && \
-    mkdir -p /usr/src/app/js && \
-    mkdir -p /usr/src/app/script
     
-WORKDIR /usr/src/app
+ARG DOCKER_IMAGE_NAME
+ARG DOCKER_IMAGE_TAG
 
-# Install app dependencies
-COPY package.json /usr/src/app/package-original.json
-
-RUN \
-    sed 's/TestWrapper/js\/main/g' package-original.json > package.json && \
-    rm -rf node_modules nbproject && \
-    echo "----------------"
-
-RUN npm install
-
-# Bundle app source
-# COPY node_modules node_modules
-COPY js /usr/src/app/js
-COPY Scripts /usr/src/app/script
-
-CMD [ "npm", "start" ]
-
+ENV DOCKER_IMAGE_NAME ${DOCKER_IMAGE_NAME:-UnknownName}
+ENV DOCKER_IMAGE_TAG ${DOCKER_IMAGE_TAG:-UnknownRevision}
