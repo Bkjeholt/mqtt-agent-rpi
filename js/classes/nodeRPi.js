@@ -1,13 +1,13 @@
 /************************************************************************
  Product    : Home information and control
- Date       : 2016-12-05
- Copyright  : Copyright (C) 2016 Kjeholt Engineering. All rights reserved.
+ Date       : 2017-03-03
+ Copyright  : Copyright (C) 2016-2017 Kjeholt Engineering. All rights reserved.
  Contact    : dev@kjeholt.se
  Url        : http://www-dev.kjeholt.se
  Licence    : ---
  ---------------------------------------------------------
  File       : MqttAgentRPi/nodeRPi.js
- Version    : 0.3.1
+ Version    : 0.4.0
  Author     : Bjorn Kjeholt
  *************************************************************************/
 
@@ -16,6 +16,8 @@ var fs = require('fs');
 var spawn = require("child_process").spawn;
 var cpuLoad = require('cpu-load');
 var network = require('network');
+var sysInfo = require('systeminformation');
+
 // var vcgencmd = require('vcgencmd');
 
 var nodeRPi = function (ci) {
@@ -49,16 +51,11 @@ var nodeRPi = function (ci) {
                                        dao: 0,
                                        value: null,
                                        func: function(callback) {
-                                                    if (process.env.SIMULATED_MODE === undefined) {
-                                                        fs.readFile('/sys/class/thermal/thermal_zone0/temp',function (err,data) {
-                                                                var cpuTemp = (Math.round(data/100))/10.0;
-                                                                callback(null,cpuTemp);
-                                                        });
-                                                    } else {
-                                                        var cpuTemp= -3.14;
-                                                        callback(null, cpuTemp);
-                                                    }
-                                                } }] },
+                                                    sysInfo.cpuTemperature(function(data) {
+                                                        callback(null,data.main);
+                                                    });
+                                                }
+                                            }],
                          { name: "System",
                            type: "Info",
                            devices: [{ name: "Boot-time",
@@ -79,6 +76,15 @@ var nodeRPi = function (ci) {
                                                         callback(null,load*100);
                                                     });
                                        }},
+                                     { name: "Processor Architecture",
+                                       dat: "text",
+                                       det: "static",
+                                       value: null,
+                                       func: function(callback) {
+                                                    sysInfo.osInfo(function(data) {
+                                                        callback(null,data.arch);
+                                                    });
+                                       }},
                                      { name: "Memory usage",
                                        dat: "int",
                                        det: "semistatic",
@@ -89,32 +95,62 @@ var nodeRPi = function (ci) {
                                                name: "mem-total",
                                                data: "int",
                                                det: "semistatic",
-                                               value: null
+                                               value: null,
+                                               func: function(callback) {
+                                                            sysInfo.mem(function(data) {
+                                                                    callback(null,data.total);
+                                                                });
+                                                        }
                                        },{
                                                name: "mem-used",
                                                data: "int",
                                                det: "dynamic",
-                                               value: null
+                                               value: null,
+                                               func: function(callback) {
+                                                            sysInfo.mem(function(data) {
+                                                                    callback(null,data.total);
+                                                                });
+                                                        }
                                        },{
                                                name: "mem-free",
                                                data: "int",
                                                det: "dynamic",
-                                               value: null
+                                               value: null,
+                                               func: function(callback) {
+                                                            sysInfo.mem(function(data) {
+                                                                    callback(null,data.free);
+                                                                });
+                                                        }
                                        },{
                                                name: "swap-total",
                                                data: "int",
                                                det: "semistatic",
-                                               value: null
+                                               value: null,
+                                               func: function(callback) {
+                                                            sysInfo.mem(function(data) {
+                                                                    callback(null,data.swaptotal);
+                                                                });
+                                                        }
                                        },{
                                                name: "swap-used",
                                                data: "int",
                                                det: "dynamic",
-                                               value: null
+                                               value: null,
+                                               func: function(callback) {
+                                                            sysInfo.mem(function(data) {
+                                                                    callback(null,data.swapused);
+                                                                });
+                                                        }
                                        },{
                                                name: "swap-free",
                                                data: "int",
                                                det: "dynamic",
-                                               value: null
+                                               value: null,
+                                               func: function(callback) {
+                                                            sysInfo.mem(function(data) {
+                                                                    callback(null,data.swapfree);
+                                                                });
+                                                        }
                                        }],
                                        func: function(callback) {
                                                     
