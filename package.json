@@ -13,7 +13,8 @@
   "dependencies" : {
     "mqtt" : "1.7.3",
     "cpu-load" : "1.0.0",
-    "network" : "0.3.0"
+    "network" : "0.3.0",
+    "systeminformation":"3.17.0"
   },
   "scripts" : {
     "start" : "node ./js/main.js"
