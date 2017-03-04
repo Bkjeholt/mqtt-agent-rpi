@@ -43,6 +43,7 @@ var configInfo = {
                                             scan_new_nodes: 300000 }
                                   };
 
+console.log("Config info: ",configInfo)
 var agentObj = agent.create(configInfo);
 var healthCheckObj = http.create(configInfo);
 
