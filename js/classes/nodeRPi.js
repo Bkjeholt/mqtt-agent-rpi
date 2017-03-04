@@ -55,7 +55,7 @@ var nodeRPi = function (ci) {
                                                         callback(null,data.main);
                                                     });
                                                 }
-                                            }],
+                                            }]},
                          { name: "System",
                            type: "Info",
                            devices: [{ name: "Boot-time",
