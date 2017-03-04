@@ -325,7 +325,7 @@ var nodeRPi = function (ci) {
      })();
 };
 
-exports.create_node = function(ci){
+exports.create = function(ci){
     return new nodeRPi(ci);
 };
 
