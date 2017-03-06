@@ -13,9 +13,10 @@
 
 var mqtt = require('mqtt');
 //var nodeHandler = require('./nodeHandler');
-var nodeHandler = require('./nodeRPi');
+var nodeHandler = require('./nodes');
+var mqqSupport = require('./support/mqttBasics');
 
-agentBody = function(ci) {
+var agentBody = function(ci) {
     var self = this;
     this.ci = ci;
 

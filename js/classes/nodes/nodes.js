@@ -29,7 +29,7 @@ var nodes = function (ci) {
     
     this.ci = ci;
 
-    this.getData = function (callback) {
+    this.getNodeData = function (callback) {
         if (self.objNodeMem !== undefined)
             self.objNodeMem.getData(function(err,headerJson,bodyJson) {
                 callback(err,headerJson,bodyJson);
@@ -41,7 +41,7 @@ var nodes = function (ci) {
             });
     };
 
-    this.getInfo = function (callback) {
+    this.getNodeInfo = function (callback) {
         if (self.objNodeMem !== undefined)
             self.objNodeMem.getInfo(function(err,headerJson,bodyJson) {
                 callback(err,headerJson,bodyJson);

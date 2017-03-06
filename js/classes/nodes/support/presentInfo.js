@@ -6,7 +6,7 @@
  Url        : http://www-dev.kjeholt.se
  Licence    : ---
  ---------------------------------------------------------
- File       : mqtt-agent-sysinfo/js/classes/nodes/support/generateInfo.js
+ File       : mqtt-agent-sysinfo/js/classes/nodes/support/presentInfo.js
  Version    : 0.1.0
  Author     : Bjorn Kjeholt
  *************************************************************************/

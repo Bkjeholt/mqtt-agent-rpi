@@ -44,8 +44,9 @@ exports.topicStrToJson = function (str, callback) {
         }
     };
     
-exports.mqttPublish = function(mqttObj, nodeObj, configInfo) {        
+exports.mqttPublishInfo = function(mqttObj, nodeObj, configInfo) {        
     var topicHeaderStr = { info_present: "info/present/" + self.ci.agent.name,
+                           data_present: "data/present/" + self.ci.agent.name,
                            data_request: "data/request/" + self.ci.agent.name };
         
     mqttObj.publish( topicHeaderStr.info_present,
@@ -56,16 +57,22 @@ exports.mqttPublish = function(mqttObj, nodeObj, configInfo) {
                                         rev: configInfo.agent.rev }),
                      { qos: 0, retain: 1 });
                                 
-    nodeObj.getNodeInfo(null,function(err,topicJson,msgJson) {
-            var topicStr = "";
+    nodeObj.getNodeInfo(function(err,topicJson,msgJson) {
+            var topicStr = null;
             var msgStr = "";
             
-            if (topicJson.order === "info_present")
-                topicStr = topicHeaderStr.info_present;
-            else
-                topicStr = topicHeaderStr.data_request;
+            switch (topicJson.order) {
+                case "info_present":
+                    topicStr = topicHeaderStr.info_present;
+                    break;
+                case "data_request":
+                    topicStr = topicHeaderStr.data_request;
+                    break;
+                default:
+                    break;
+            }
                 
-            if (!err) {
+            if ((!err) && (topicStr !== null)) {
                 if (topicJson.node !== undefined) {
                     topicStr = topicStr + "/" + topicJson.node;
                     msgStr = JSON.stringify(msgJson);

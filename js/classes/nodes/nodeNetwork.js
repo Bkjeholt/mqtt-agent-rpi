@@ -14,8 +14,8 @@
 var sysInfo = require('systeminformation');
 var network = require('network');
 
-var genData = require('./support/generateData');
-var genInfo = require('./support/generateInfo');
+var genData = require('./support/presentData');
+var genInfo = require('./support/presentInfo');
 
 var infoNode = {name: "NetworkInfo",
                 rev: "0.1.0",
