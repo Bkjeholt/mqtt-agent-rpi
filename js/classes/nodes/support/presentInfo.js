@@ -26,7 +26,7 @@ exports.presentNodeInfo = function (nodeInfo,callback) {
                   type: nodeInfo.type });
             
     for (deviceIndex = 0; deviceIndex < nodeInfo.devices.length; deviceIndex = deviceIndex + 1) {
-        if (nodeInfo.devices[deviceIndex].datatype !== undefined) {
+        if (nodeInfo.devices[deviceIndex].dat !== undefined) {
             callback(   null,
                         { order: "info_present",
                           node: nodeInfo.name,
@@ -35,8 +35,8 @@ exports.presentNodeInfo = function (nodeInfo,callback) {
                           date: new Date(),
                           name: nodeInfo.devices[deviceIndex].name,
                           rev: nodeInfo.devices[deviceIndex].rev,
-                          datatype: nodeInfo.devices[deviceIndex].datatype,
-                          devicetype: nodeInfo.devices[deviceIndex].devicetype,
+                          datatype: nodeInfo.devices[deviceIndex].dat,
+                          devicetype: nodeInfo.devices[deviceIndex].det,
                           outvar: 1 });
             
         }
@@ -51,8 +51,8 @@ exports.presentNodeInfo = function (nodeInfo,callback) {
                           date: new Date(),
                           name: nodeInfo.devices[deviceIndex].variables[variableIndex].name,
                           rev: nodeInfo.devices[deviceIndex].variables[variableIndex].rev,
-                          datatype: nodeInfo.devices[deviceIndex].variables[variableIndex].datatype,
-                          devicetype: nodeInfo.devices[deviceIndex].variables[variableIndex].devicetype,
+                          datatype: nodeInfo.devices[deviceIndex].variables[variableIndex].dat,
+                          devicetype: nodeInfo.devices[deviceIndex].variables[variableIndex].det,
                           outvar: 1 });
             
         }

@@ -20,17 +20,24 @@ var variableLoop = function (nodeName, devObj, data, callback) {
                     if (varObj.func !== undefined) {
                         (varObj.func)(data, function(err,result) {
                             if (!err) {
-                                // Publish data
-                                console.log ("Publish variable data",result);
+                                if ((varObj.det === "dynamic") ||
+                                    (varObj.value === null) ||
+                                    (result !== varObj.value)) {
+                                
+                                    varObj.value = result;
+                                    
+                                    // Publish data
+                                    console.log ("Publish variable data",result);
                         
-                                callback(null,
-                                         { order: "data_present",
-                                           node: nodeName,
-                                           device: devObj.name,
-                                           variable: varObj.name },
-                                         { time: Math.floor((new Date())/1000),
-                                           date: new Date(),
-                                           data: result } );
+                                    callback(null,
+                                             { order: "data_present",
+                                               node: nodeName,
+                                               device: devObj.name,
+                                               variable: varObj.name },
+                                             { time: Math.floor((new Date())/1000),
+                                               date: new Date(),
+                                               data: result } );
+                                }
                                 varLoop(data,varIndex-1, callback);
                             }
                         });
@@ -53,17 +60,25 @@ exports.presentNodeData = function (nodeInfo,callback) {
             
             if (devObj.func !== undefined) {
                 (devObj.func)(function(err,result) {
-                        if (devObj.datatype !== undefined) {
-                            // Publish data
-                            console.log ("Publish device data",result);
+                        if (devObj.dat !== undefined) {
+                            
+                            if ((devObj.det === "dynamic") ||
+                                (devObj.value === null) ||
+                                (result !== devObj.value)) {
+                            
+                                devObj.value = result;
+                                
+                                // Publish data
+                                console.log ("Publish device data",result);
                         
-                            callback(   null,
-                                        { order: "data_present",
-                                          node: nodeInfo.name,
-                                          device: devObj.name },
-                                        { time: Math.floor((new Date())/1000),
-                                          date: new Date(),
-                                          data: result } );
+                                callback(   null,
+                                            { order: "data_present",
+                                              node: nodeInfo.name,
+                                              device: devObj.name },
+                                            { time: Math.floor((new Date())/1000),
+                                              date: new Date(),
+                                              data: result } );
+                            }
                         }
                         
                         variableLoop(nodeInfo.name,devObj,result, callback);

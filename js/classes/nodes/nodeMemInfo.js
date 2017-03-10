@@ -31,17 +31,17 @@ var infoNode = {name: "MemoryInfo",
                                 },  
                         variables: [{
                                         name: "total",
-                                        data: "int",
+                                        dat: "int",
                                         det: "semistatic",
                                         value: null,
                                         func: function(data,callback) {
                                                 if (data.total !== undefined)
                                                     callback(null,Math.round(data.total/(1024*1024)));
-                                                    }
+                                            }
                                     },
                                     {
                                         name: "used",
-                                        data: "int",
+                                        dat: "int",
                                         det: "dynamic",
                                         value: null,
                                         func: function(data,callback) {
@@ -51,7 +51,7 @@ var infoNode = {name: "MemoryInfo",
                                     },
                                     {
                                         name: "free",
-                                        data: "int",
+                                        dat: "int",
                                         det: "dynamic",
                                         value: null,
                                         func: function(data,callback) {
@@ -71,17 +71,17 @@ var infoNode = {name: "MemoryInfo",
                                 },  
                         variables: [{
                                         name: "total",
-                                        data: "int",
+                                        dat: "int",
                                         det: "semistatic",
                                         value: null,
                                         func: function(data,callback) {
                                                 if (data.swaptotal !== undefined)
                                                     callback(null,Math.round(data.swaptotal/(1024*1024)));
-                                                    }
+                                            }
                                     },
                                     {
                                         name: "used",
-                                        data: "int",
+                                        dat: "int",
                                         det: "dynamic",
                                         value: null,
                                         func: function(data,callback) {
@@ -91,7 +91,7 @@ var infoNode = {name: "MemoryInfo",
                                     },
                                     {
                                         name: "free",
-                                        data: "int",
+                                        dat: "int",
                                         det: "dynamic",
                                         value: null,
                                         func: function(data,callback) {
