@@ -1,10 +1,10 @@
 #!/bin/sh -f
-DOCKER_IMAGE_NAME=bkjeholt/mqtt-agent-rpi
-DOCKER_CONTAINER_NAME=hic-agent-rpi
+DOCKER_IMAGE_NAME=bkjeholt/mqtt-agent-sysinfo
+DOCKER_CONTAINER_NAME=hic-agent-si
 
 DOCKER_IMAGE_BASE_TAG=${1}
 
-ARCHITECTURE=rpi
+ARCHITECTURE=x86
 
 echo "------------------------------------------------------------------------"
 echo "-- Run image:       $DOCKER_IMAGE_NAME:latest "
