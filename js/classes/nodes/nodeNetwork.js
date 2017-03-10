@@ -11,7 +11,7 @@
  Author     : Bjorn Kjeholt
  *************************************************************************/
 
-var sysInfo = require('systeminformation');
+// var sysInfo = require('systeminformation');
 var network = require('network');
 
 var genData = require('./support/presentData');

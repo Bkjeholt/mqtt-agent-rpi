@@ -54,8 +54,8 @@ var nodes = function (ci) {
     };
 
     (function setup(ci) {
-        this.objNodeMem = nodeMemInfo.create(self.ci);
-        this.objNodeNetwork = nodeNetwork.create(self.ci);
+        self.objNodeMem = nodeMemInfo.create(self.ci);
+        self.objNodeNetwork = nodeNetwork.create(self.ci);
     })(self.ci);
 
 };

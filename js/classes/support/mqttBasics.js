@@ -11,50 +11,93 @@
  Author     : Bjorn Kjeholt
  *************************************************************************/
 
-exports.topicStrToJson = function (str, callback) {
+exports.topicStrToJson = function (topicStr, msgStr, callback) {
         var t = str.split("/");
-        var result = {group: '---',
-                       order: '---',
-                       agent: '---',
-                       node: '---',
-                       device: '---',
-                       variable: '---' };
+        var topicJson = {group: '---',
+                         order: '---',
+                         agent: '---',
+                         node: '---',
+                         device: '---',
+                         variable: '---' };
+        var msgJson = JSON.parse(msgStr);
         
         if (t.length > 1) {
-            result.group = t[0];
-            result.order = t[1];
+            topicJson.group = t[0];
+            topicJson.order = t[1];
         
             if (t[2] !== undefined) { 
-                result.agent = t[2];
+                topicJson.agent = t[2];
         
                 if (t[3] !== undefined) {
-                    result.node = t[3];
+                    topicJson.node = t[3];
         
                     if (t[4] !== undefined) { 
-                        result.device = t[4];
+                        topicJson.device = t[4];
         
                         if (t[5] !== undefined) 
-                            result.variable = t[5];
+                            topicJson.variable = t[5];
                     }
                 }
             }
-            callback(null,result);
+            
+            
+            callback(null,topicJson, msgJson);
         } else {
             // The topic doesn't contain the required 'group' and 'order' field, skip it!
         }
     };
     
-exports.mqttPublishInfo = function(mqttObj, nodeObj, configInfo) {        
-    var topicHeaderStr = { info_present: "info/present/" + self.ci.agent.name,
-                           data_present: "data/present/" + self.ci.agent.name,
-                           data_request: "data/request/" + self.ci.agent.name };
-        
-    mqttObj.publish( topicHeaderStr.info_present,
+exports.mqttPublishData = function(mqttObj, nodeObj, agentInfo) {        
+    var topicHeaderArray = { data_present: "data/present/" };
+       
+    nodeObj.getNodeData(function(err,topicJson,msgJson) {
+            var topicStr = null;
+            var msgStr = "";
+            
+            switch (topicJson.order) {
+                case "data_present":
+                    topicStr = topicHeaderArray.data_present;
+                    break;
+                default:
+                    break;
+            }
+                
+            if ((!err) && 
+                (topicStr !== null) && 
+                (topicJson.node !== undefined) && 
+                (topicJson.device !== undefined)) {
+
+                topicStr = "data/present/" + agentInfo.name + "/" + topicJson.node + "/" + topicJson.device;
+                    
+                if (topicJson.variable !== undefined) {
+                    // Create a variable message
+                    topicStr = topicStr + "/" + topicJson.variable;
+                }
+                  
+                msgStr = JSON.stringify(msgJson);
+           
+            console.log("Publish: Topic="+topicStr+" Payload="+msgStr);
+            
+                mqttObj.publish(topicStr,msgStr,{ qos: 0, retain: 1 });
+            } else {
+                console.log("AgentBody: Error from getNodeInfo. err=",err);
+            }
+        });
+};
+
+exports.mqttPublishInfo = function(mqttObj, nodeObj, agentInfo) {        
+    var topicHeaderArray = { info_present: "info/present/",
+                             data_present: "data/present/",
+                             data_request: "data/request/" };
+       
+    console.log("Publish topic: " + topicHeaderArray.info_present + agentInfo.name);
+    
+    mqttObj.publish( topicHeaderArray.info_present + agentInfo.name,
                      JSON.stringify({
                                         time: Math.floor((new Date())/1000),
                                         date: new Date(),
-                                        name: configInfo.agent.name,
-                                        rev: configInfo.agent.rev }),
+                                        name: agentInfo.name,
+                                        rev: agentInfo.rev }),
                      { qos: 0, retain: 1 });
                                 
     nodeObj.getNodeInfo(function(err,topicJson,msgJson) {
@@ -63,10 +106,10 @@ exports.mqttPublishInfo = function(mqttObj, nodeObj, configInfo) {
             
             switch (topicJson.order) {
                 case "info_present":
-                    topicStr = topicHeaderStr.info_present;
+                    topicStr = topicHeaderArray.info_present;
                     break;
                 case "data_request":
-                    topicStr = topicHeaderStr.data_request;
+                    topicStr = topicHeaderArray.data_request;
                     break;
                 default:
                     break;
@@ -74,7 +117,7 @@ exports.mqttPublishInfo = function(mqttObj, nodeObj, configInfo) {
                 
             if ((!err) && (topicStr !== null)) {
                 if (topicJson.node !== undefined) {
-                    topicStr = topicStr + "/" + topicJson.node;
+                    topicStr = topicStr + agentInfo.name + "/" + topicJson.node;
                     msgStr = JSON.stringify(msgJson);
                     
                     if (topicJson.device !== undefined) {
@@ -86,6 +129,7 @@ exports.mqttPublishInfo = function(mqttObj, nodeObj, configInfo) {
                     
                         }
                     }
+                    console.log("Publish topic: " + topicStr);
                                         
                     mqttObj.publish(topicStr,msgStr,{ qos: 0, retain: 1 });
                 }

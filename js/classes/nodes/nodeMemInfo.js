@@ -36,7 +36,7 @@ var infoNode = {name: "MemoryInfo",
                                         value: null,
                                         func: function(data,callback) {
                                                 if (data.total !== undefined)
-                                                    callback(null,data.total);
+                                                    callback(null,Math.round(data.total/(1024*1024)));
                                                     }
                                     },
                                     {
@@ -46,7 +46,7 @@ var infoNode = {name: "MemoryInfo",
                                         value: null,
                                         func: function(data,callback) {
                                                 if (data.used !== undefined)
-                                                    callback(null,data.used);
+                                                    callback(null,Math.round(data.used/(1024*1024)));
                                             }
                                     },
                                     {
@@ -56,7 +56,7 @@ var infoNode = {name: "MemoryInfo",
                                         value: null,
                                         func: function(data,callback) {
                                                 if (data.free !== undefined)
-                                                    callback(null,data.free);
+                                                    callback(null,Math.round(data.free/(1024*1024)));
                                             }
                                     }]
                     },
@@ -76,7 +76,7 @@ var infoNode = {name: "MemoryInfo",
                                         value: null,
                                         func: function(data,callback) {
                                                 if (data.swaptotal !== undefined)
-                                                    callback(null,data.swaptotal);
+                                                    callback(null,Math.round(data.swaptotal/(1024*1024)));
                                                     }
                                     },
                                     {
@@ -86,7 +86,7 @@ var infoNode = {name: "MemoryInfo",
                                         value: null,
                                         func: function(data,callback) {
                                                 if (data.swapused !== undefined)
-                                                    callback(null,data.swapused);
+                                                    callback(null,Math.round(data.swapused/(1024*1024)));
                                             }
                                     },
                                     {
@@ -96,7 +96,7 @@ var infoNode = {name: "MemoryInfo",
                                         value: null,
                                         func: function(data,callback) {
                                                 if (data.swapfree !== undefined)
-                                                    callback(null,data.swapfree);
+                                                    callback(null,Math.round(data.swapfree/(1024*1024)));
                                             }
                                     }]
                     }]
@@ -113,6 +113,7 @@ var nodeMemInfo = function (ci) {
         /*
          * Prepare and send node information
          */
+        console.log("nodeMemInfo: ", infoNode);
         genInfo.presentNodeInfo(infoNode,function(err,orderJson,bodyJson) {
             callback(err,orderJson,bodyJson);
         });
@@ -126,5 +127,6 @@ var nodeMemInfo = function (ci) {
 };
 
 exports.create = function(ci){
+        console.log("nodeMemInfo: create", infoNode);
     return new nodeMemInfo(ci);
 };

@@ -13,8 +13,8 @@
 
 var mqtt = require('mqtt');
 //var nodeHandler = require('./nodeHandler');
-var nodeHandler = require('./nodes');
-var mqqSupport = require('./support/mqttBasics');
+var nodeHandler = require('./nodes/nodes');
+var mqttSupport = require('./support/mqttBasics');
 
 var agentBody = function(ci) {
     var self = this;
@@ -38,7 +38,8 @@ var agentBody = function(ci) {
         }
 
     };
-    
+ 
+    /*
     this.mqttPublish = function(topic,msg) {
         var msgStr = JSON.stringify(msg);
         
@@ -66,163 +67,43 @@ var agentBody = function(ci) {
                                  { qos: 0,
                                    retain: 1 });
     };
-    
-    this.publishInfo = function (topic,msg) {
-        var currTime = Math.floor((new Date())/1000);
-        
-        // Publish info about the agent
-        
-        self.mqttPublish({  group: 'info',
-                            order: 'present',
-                            agent: self.ci.agent.name  },
-                         {  time: currTime,
-                            date: new Date(),
-                            name: self.ci.agent.name,
-                            rev:  self.ci.agent.rev });
-
-        self.nodeClient.updateNodeInfoList(function(err) {
-            var nodeIndex = 0;
-            var deviceIndex = 0;
-        
-//            console.log("infoRequest - nodeInfoList",self.nodeClient.nodeInfoList);
-        
-            for (nodeIndex=0; nodeIndex < self.nodeClient.nodeInfoList.length; nodeIndex = nodeIndex+1) {
-
-                self.mqttPublish({  group: 'info',
-                                    order: 'present',
-                                    agent: self.ci.agent.name,
-                                    node:  self.nodeClient.nodeInfoList[nodeIndex].name },
-                                 {  time: currTime,
-                                    date: new Date(),
-                                    name: self.nodeClient.nodeInfoList[nodeIndex].name,
-                                    type:  self.nodeClient.nodeInfoList[nodeIndex].type });    
-                            
-                for (deviceIndex=0; deviceIndex < self.nodeClient.nodeInfoList[nodeIndex].devices.length; deviceIndex = deviceIndex+1) {
-                    self.mqttPublish({  group: 'info',
-                                        order: 'present',
-                                        agent: self.ci.agent.name,
-                                        node:  self.nodeClient.nodeInfoList[nodeIndex].name,
-                                        device:  self.nodeClient.nodeInfoList[nodeIndex].devices[deviceIndex].name },
-                                     {  time: currTime,
-                                        date: new Date(),
-                                        name: self.nodeClient.nodeInfoList[nodeIndex].devices[deviceIndex].name,
-                                        rev:  '---',
-                                        datatype: self.nodeClient.nodeInfoList[nodeIndex].devices[deviceIndex].dat,
-                                        devicetype: self.nodeClient.nodeInfoList[nodeIndex].devices[deviceIndex].det,
-                                        outvar: (self.nodeClient.nodeInfoList[nodeIndex].devices[deviceIndex].outdata !== undefined)? self.nodeClient.nodeInfoList[nodeIndex].devices[deviceIndex].outdata : undefined});  
-                }
-            }
-        });
-       
-        
-    };
+*/
 
     this.mqttConnect = function(connack) {
 //        console.log("MQTT connected :",connack);
         self.mqttConnected = true;
         self.ci.mqtt.connected = true;
         self.mqttSubscribe();
-        self.publishInfo({},{});
+        mqttSupport.mqttPublishInfo(self.mqttClient,
+                                    self.nodeClient,
+                                    { name: self.ci.agent.name,     // Agent name
+                                      rev: self.ci.agent.rev });    // Agent rev
     };
     
-
-    this.topicStrToJson = function (str) {
-        var t = str.split("/");
-        var result = {group: t[0],
-                       order: t[1],
-                       agent: '---',
-                       node: '---',
-                       device: '---',
-                       variable: '---' };
-        
-        if (t[2] !== undefined) { 
-            result.agent = t[2];
-        
-            if (t[3] !== undefined) {
-                result.node = t[3];
-        
-                if (t[4] !== undefined) { 
-                    result.device = t[4];
-        
-                    if (t[5] !== undefined) 
-                        result.variable = t[5];
-                }
-            }
-        }
-        
-        return result;
-    };
-    
-    this.msgStrToJson = function (str) {
-        var m = JSON.parse(str);
-        
-        return m;
-    };
-    
-
     this.mqttMessage = function(topicStr, messageStr, packet) {
 
-        var topic = self.topicStrToJson(topicStr);
-        var msg   = self.msgStrToJson(messageStr);
-        var currTime = Math.floor((new Date())/1000);
-        
-//        var devObj = self.ci.mqtt.functions.devices;
-//        var devInfo;
-        var i;
-        
-//        console.log("MQTT topic:   ",topic);
-//        console.log("MQTT message: ",msg);
-    //    console.log("MQTT Receive: ",topicStr," -> ",messageStr);
-        
-        switch (topic.group) {
-            case 'info':
-                switch (topic.order) {
-                    case 'config':
+        mqttSupport.topicStrToJson(topicStr, messageStr, function(err,topic,payload) {
+                var utc = Math.floor((new Date())/1000);
+                
+                switch (topic.group) {
+                    case 'data':
                         break;
-//                    case 'refresh':
-//                        // TODO: Just now if a refresh is requested all info about nodes and devices is sent to the manager independent if it is new or not.
-//                        
-//                        self.infoRequest(topic,msg);
-//                        break;
-                    case 'request':
-                        self.infoRequest(topic,msg);
-                        
+                    case 'info':
+                        switch (topic.order) {
+                            case 'request':
+                                mqttSupport.mqttPublishInfo(self.mqttClient,
+                                                            self.nodeClient,
+                                                            { name: self.ci.agent.name,     // Agent name
+                                                              rev: self.ci.agent.rev });    // Agent rev
+                                break;
+                            default:
+                                break;
+                        };
                         break;
                     default:
                         break;
-                }
-                break;
-            case 'data':
-                switch (topic.order) {
-                    case 'response':
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            case 'status':
-                switch (topic.order) {
-                    case 'alive': //status/alive/AgentName
-                        /*
-                         * Reeceived a echo message from onw agent
-                         */
-                        
-                        self.ci.mqtt.link.latest_status_time = Math.floor((new Date())/1000);
-
-                            if (self.ci.mqtt.link.status !== 'alive') {
-                                self.ci.mqtt.link.status = 'alive';
-                                console.log("Link between Agent and mqtt-brooker alive");
-                                self.infoRequest({},{});
-                            }    
-                            
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            default:
-                break;
-        } 
+                };
+            });
     };
 
     this.mqttDisconnect = function () {
@@ -249,19 +130,8 @@ var agentBody = function(ci) {
         }(ci));
         
         (function nodeSetup (ci) {
-            self.nodeClient = nodeHandler.create_node(ci); 
-            
-/*            self.nodeClient.update_NodeInfoList(function(err) {
-                            if (!err) {
-                                console.log("update node info list ",self.nodeClient.nodeInfoList);          
-                                
-                                self.gateWayReady = true;
-                            } else {
-                                console.log("update node info list error ",err);          
-                                
-                            } 
-            });*/
-            
+            self.nodeClient = nodeHandler.create(ci); 
+                        
         })(ci);    
     })(this.ci);
     
@@ -276,37 +146,12 @@ var agentBody = function(ci) {
                     if (true) {
                         
                         if (self.ci.mqtt.connected) {
-                            if (self.nodeClient.nodeInfoList.length > 0) {
-                                /*
-                                 * There are at least one device identified
-                                 * Scan for data value for all identified devices
-                                 */
-                                self.nodeClient.get_NodeDataList(
-                                        function (err,nodeDataList) {
-                                            if (!err) {
-//                                                console.log("GetNodeDatas result no err Nodedata = ",nodeDataList);
-                                                for (var i=0; i < nodeDataList.length; i=i+1) {
-//                                                    console.log("GetNodeData[" + i +"] ->",nodeDataList[i]);
-                                                    for (var j=0; j < nodeDataList[i].devices.length; j=j+1) {                                                       
-                                                        self.mqttPublish({  group: 'data',
-                                                                            order: 'present',
-                                                                            agent: self.ci.agent.name,
-                                                                            node:  nodeDataList[i].name,
-                                                                            device:  nodeDataList[i].devices[j].name },
-                                                                         {  time: currTime,
-                                                                            date: new Date(),
-                                                                            data: nodeDataList[i].devices[j].data });    
-
-                                                        if (nodeDataList[i].devices.email !== undefined) {
-                                                        }
-                                                    }
-                                                }
-                                            } else {
-//                                                console.log("GetNodeDatas result",err," Nodedata = ",nodeDataList);
-                                            }
-                                        });
-                            };
-                            
+                            mqttSupport.mqttPublishData(
+                                    self.mqttClient,
+                                    self.nodeClient,
+                                    { name: self.ci.agent.name,     // Agent name
+                                      rev: self.ci.agent.rev });
+                                                        
                          
 
                             /*
@@ -321,6 +166,7 @@ var agentBody = function(ci) {
     setInterval(function () {
 //        console.log("Check to see if the mqtt brooker is connected", self.mqttConnected);
                         if (!self.mqttConnected) {
+                            console.log("MQTT broker connection is down. Connect ...");
                             self.mqttClient = mqtt.connect("mqtt://"+ci.mqtt.ip_addr,
                                                            { connectTimeout: 5000 });
 

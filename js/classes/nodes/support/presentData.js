@@ -11,62 +11,70 @@
  Author     : Bjorn Kjeholt
  *************************************************************************/
 
-exports.presentNodeData = function (nodeInfo,callback) {
-
-    var deviceIndex;
-    var variableIndex;
-    
-    for (deviceIndex = 0; deviceIndex < nodeInfo.devices.length; deviceIndex = deviceIndex + 1) {
-        if (nodeInfo.devices[deviceIndex].func !== undefined) {
-            (nodeInfo.devices[deviceIndex].func)(function(err,result) {
-                        var variableIndex;
-                        
-                        if (!err) {
-                            if (nodeInfo.devices[deviceIndex].datatype !== undefined) {
-                                callback(   null,
-                                            { order: "data_present",
-                                              node: nodeInfo.name,
-                                              device: nodeInfo.devices[deviceIndex].name },
-                                            { time: Math.floor((new Date())/1000),
-                                              date: new Date(),
-                                              data: result } );
-                            }
-                            
-                            for (variableIndex = 0; variableIndex < nodeInfo.devices[deviceIndex].variables.length; variableIndex = variableIndex + 1) {
-                                (nodeInfo.devices[deviceIndex].variables[variableIndex].func)(result,function(err,result) {
-                                            if (!err) {
-                                                callback(   null,
-                                                            { order: "data_present",
-                                                              node: nodeInfo.name,
-                                                              device: nodeInfo.devices[deviceIndex].name,
-                                                              variable: nodeInfo.devices[deviceIndex].variables[variableIndex].name },
-                                                            { time: Math.floor((new Date())/1000),
-                                                              date: new Date(),
-                                                              data: result } );
-                                                
-                                            }
-                                });
-                            }
-                        }
-            });
-            
-        } else {
-            for (variableIndex = 0; variableIndex < nodeInfo.devices[deviceIndex].variables.length; variableIndex = variableIndex + 1) {
-                (nodeInfo.devices[deviceIndex].variables[variableIndex].func)(undefined,function(err,result) {
+var variableLoop = function (nodeName, devObj, data, callback) {
+    if (devObj.variables !== undefined) {
+        (function varLoop(data,varIndex) {
+                var varObj = null;
+                if (varIndex > 0) {
+                    varObj = devObj.variables[varIndex-1];
+                    if (varObj.func !== undefined) {
+                        (varObj.func)(data, function(err,result) {
                             if (!err) {
-                                callback(   null,
-                                            { order: "data_present",
-                                              node: nodeInfo.name,
-                                              device: nodeInfo.devices[deviceIndex].name,
-                                              variable: nodeInfo.devices[deviceIndex].variables[variableIndex].name },
-                                            { time: Math.floor((new Date())/1000),
-                                              date: new Date(),
-                                              data: result } );
-                                                
+                                // Publish data
+                                console.log ("Publish variable data",result);
+                        
+                                callback(null,
+                                         { order: "data_present",
+                                           node: nodeName,
+                                           device: devObj.name,
+                                           variable: varObj.name },
+                                         { time: Math.floor((new Date())/1000),
+                                           date: new Date(),
+                                           data: result } );
+                                varLoop(data,varIndex-1, callback);
                             }
                         });
-            }
-        }        
+                    }
+                } else {
+                }
+            })(data, devObj.variables.length);
+    } else {
+        // No variables defined for this device
+        callback(null);
     }
+};
+
+exports.presentNodeData = function (nodeInfo,callback) {
+
+    (function deviceLoop(deviceIndex) {
+        var devObj = null;
+        if (deviceIndex > 0) {
+            devObj = nodeInfo.devices[deviceIndex-1];
+            
+            if (devObj.func !== undefined) {
+                (devObj.func)(function(err,result) {
+                        if (devObj.datatype !== undefined) {
+                            // Publish data
+                            console.log ("Publish device data",result);
+                        
+                            callback(   null,
+                                        { order: "data_present",
+                                          node: nodeInfo.name,
+                                          device: devObj.name },
+                                        { time: Math.floor((new Date())/1000),
+                                          date: new Date(),
+                                          data: result } );
+                        }
+                        
+                        variableLoop(nodeInfo.name,devObj,result, callback);
+                    });
+            } else {
+                variableLoop(nodeInfo.name,devObj,null, callback);
+            }
+            
+            deviceLoop(deviceIndex - 1);
+        }
+    })(nodeInfo.devices.length);
+    
 };
     
