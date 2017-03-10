@@ -39,35 +39,6 @@ var agentBody = function(ci) {
 
     };
  
-    /*
-    this.mqttPublish = function(topic,msg) {
-        var msgStr = JSON.stringify(msg);
-        
-        var topicStr = topic.group + "/" +
-                       topic.order + "/" +
-                       self.ci.agent.name;
-
-        if (topic.node !== undefined) {
-            topicStr = topicStr + "/" + topic.node;
-            
-            if (topic.device !== undefined) {
-                topicStr = topicStr + "/" + topic.device;
-                
-                if (topic.variable !== undefined) {
-                    topicStr = topicStr + "/" + topic.variable;
-                }
-            }                    
-        }
-//        console.log("MQTT topic input:",topic);
-        console.log("MQTT Publish: ",topicStr," -> ",msgStr);
-        
-        
-        self.mqttClient.publish( topicStr,
-                                 msgStr,
-                                 { qos: 0,
-                                   retain: 1 });
-    };
-*/
 
     this.mqttConnect = function(connack) {
 //        console.log("MQTT connected :",connack);

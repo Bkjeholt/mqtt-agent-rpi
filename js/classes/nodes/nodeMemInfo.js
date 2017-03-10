@@ -113,7 +113,7 @@ var nodeMemInfo = function (ci) {
         /*
          * Prepare and send node information
          */
-        console.log("nodeMemInfo: ", infoNode);
+//        console.log("nodeMemInfo: ", infoNode);
         genInfo.presentNodeInfo(infoNode,function(err,orderJson,bodyJson) {
             callback(err,orderJson,bodyJson);
         });
@@ -127,6 +127,6 @@ var nodeMemInfo = function (ci) {
 };
 
 exports.create = function(ci){
-        console.log("nodeMemInfo: create", infoNode);
+//        console.log("nodeMemInfo: create", infoNode);
     return new nodeMemInfo(ci);
 };

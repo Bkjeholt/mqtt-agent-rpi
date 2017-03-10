@@ -27,7 +27,7 @@ var variableLoop = function (nodeName, devObj, data, callback) {
                                     varObj.value = result;
                                     
                                     // Publish data
-                                    console.log ("Publish variable data",result);
+//                                    console.log ("Publish variable data",result);
                         
                                     callback(null,
                                              { order: "data_present",
@@ -69,7 +69,7 @@ exports.presentNodeData = function (nodeInfo,callback) {
                                 devObj.value = result;
                                 
                                 // Publish data
-                                console.log ("Publish device data",result);
+//                                console.log ("Publish device data",result);
                         
                                 callback(   null,
                                             { order: "data_present",

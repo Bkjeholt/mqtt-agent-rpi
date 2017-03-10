@@ -1,13 +1,13 @@
 /************************************************************************
  Product    : Home information and control
- Date       : 2017-03-04
+ Date       : 2017-03-10
  Copyright  : Copyright (C) 2017 Kjeholt Engineering. All rights reserved.
  Contact    : dev@kjeholt.se
  Url        : http://www-dev.kjeholt.se
  Licence    : ---
  ---------------------------------------------------------
  File       : mqtt-agent-sysinfo/js/classes/nodes/support/presentInfo.js
- Version    : 0.1.0
+ Version    : 0.1.2
  Author     : Bjorn Kjeholt
  *************************************************************************/
 

@@ -76,11 +76,11 @@ exports.mqttPublishData = function(mqttObj, nodeObj, agentInfo) {
                   
                 msgStr = JSON.stringify(msgJson);
            
-            console.log("Publish: Topic="+topicStr+" Payload="+msgStr);
+//            console.log("Publish: Topic="+topicStr+" Payload="+msgStr);
             
                 mqttObj.publish(topicStr,msgStr,{ qos: 0, retain: 1 });
             } else {
-                console.log("AgentBody: Error from getNodeInfo. err=",err);
+//                console.log("AgentBody: Error from getNodeInfo. err=",err);
             }
         });
 };
@@ -90,7 +90,7 @@ exports.mqttPublishInfo = function(mqttObj, nodeObj, agentInfo) {
                              data_present: "data/present/",
                              data_request: "data/request/" };
        
-    console.log("Publish topic: " + topicHeaderArray.info_present + agentInfo.name);
+//    console.log("Publish topic: " + topicHeaderArray.info_present + agentInfo.name);
     
     mqttObj.publish( topicHeaderArray.info_present + agentInfo.name,
                      JSON.stringify({
@@ -129,12 +129,12 @@ exports.mqttPublishInfo = function(mqttObj, nodeObj, agentInfo) {
                     
                         }
                     }
-                    console.log("Publish topic: " + topicStr);
+//                    console.log("Publish topic: " + topicStr);
                                         
                     mqttObj.publish(topicStr,msgStr,{ qos: 0, retain: 1 });
                 }
             } else {
-                console.log("AgentBody: Error from getNodeInfo. err=",err);
+//                console.log("AgentBody: Error from getNodeInfo. err=",err);
             }
         });
 };

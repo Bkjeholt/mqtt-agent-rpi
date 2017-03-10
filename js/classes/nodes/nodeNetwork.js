@@ -49,7 +49,7 @@ var nodeNetworkInfo = function (ci) {
         /*
          * Prepare and send node information
          */
-    console.log("Network getInfo");
+//    console.log("Network getInfo");
         genInfo.presentNodeInfo(infoNode,function(err,orderJson,bodyJson) {
             callback(err,orderJson,bodyJson);
         });
